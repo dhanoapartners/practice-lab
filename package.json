@@ -1,0 +1,17 @@
+{
+  "name": "practice-lab-tests",
+  "private": true,
+  "description": "Playwright starter suite for Practice Lab: self-healing locators, API, network mocking, HAR and RAG checks.",
+  "scripts": {
+    "test": "playwright test",
+    "test:v2": "cross-env LAB_UI=v2 playwright test",
+    "demo:broken": "cross-env LAB_UI=v2 playwright test specs/shop.plain.spec.ts",
+    "demo:healed": "cross-env LAB_UI=v2 playwright test specs/shop.healing.spec.ts",
+    "har:record": "cross-env UPDATE_HAR=1 playwright test specs/network.spec.ts -g HAR",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.48.2",
+    "cross-env": "7.0.3"
+  }
+}

@@ -1,0 +1,85 @@
+# Practice Lab: Playwright test suite
+
+Practice tests for **[Practice Lab](https://lab.dhanoapartners.com)**, a demo store, UI playground, REST API and RAG help center built for automation training.
+
+This suite shows four things most tutorials skip:
+
+| Folder / file | What it demonstrates |
+|---|---|
+| `support/healer.ts`, `support/healing-reporter.ts` | **Self-healing locators.** When a release renames a test ID, the healer finds the element by role, text, CSS or similarity, keeps the test green and writes a report of what to fix. |
+| `specs/rag.spec.ts`, `support/rag-checks.ts` | **Testing a RAG chatbot.** Retrieval, citations, refusals, and detectors for stale sources, missing retrieval and hallucinated claims. |
+| `specs/network.spec.ts` | **Network control.** Mocking responses, forcing errors, waiting on API calls and replaying traffic from a HAR file. |
+| `specs/api.spec.ts` | **API testing** with isolated sessions, auth tokens and validation errors. |
+
+## Setup
+
+Needs Node.js 20 or later.
+
+```bash
+npm install
+npx playwright install chromium
+npm test
+```
+
+Tests run against the live lab by default. To use a local copy of the site instead:
+
+```bash
+LAB_URL=http://localhost:8788 npm test
+```
+
+## Commands
+
+| Command | What it shows |
+|---|---|
+| `npm test` | Every test on UI v1 |
+| `npm run demo:broken` | Plain test-ID locators on UI v2: the test fails |
+| `npm run demo:healed` | The same journey with the healer on UI v2: it passes and writes `healing-report.md` |
+| `npm run har:record` | Records the catalog API to `fixtures/catalog.har`; the replay test uses it afterwards |
+| `LAB_LLM=1 npm test` | Adds the LLM-mode RAG test (uses the live lab's Workers AI) |
+| `npm run report` | Opens the HTML report |
+
+UI v2 simulates a release: test IDs and button labels change (`add-to-cart` becomes `add-to-bag`, "Add to cart" becomes "Add to bag"). Switch it in the lab's header or with `?ui=v2`.
+
+## Video 1: Self-healing locators (about 8 minutes)
+
+1. **The problem.** Open the shop on v1. Turn on **Test IDs** and hover over the search box and Add to cart button to show their IDs.
+2. **A passing test.** Show `specs/shop.plain.spec.ts` and run it: green.
+3. **A release breaks it.** Switch the header to **UI v2**. Show that `add-to-cart` is now `add-to-bag`. Run `npm run demo:broken`: red.
+4. **How the healer works.** Open `support/locators.ts`: each element has a primary test ID plus a fingerprint (role, name, text, CSS). Walk through `support/healer.ts`: role → text → CSS → similarity score. Point out `visibleOnly` and why it exists: without it, `getByRole('option')` healed onto a hidden `<option>` in the header.
+5. **Healed run.** Run `npm run demo:healed` and read each heal line: strategy and confidence.
+6. **The report.** Open `healing-report.md`. Each row gives the new test ID to put back in `locators.ts`. Healing keeps the pipeline green today; the report makes sure a person fixes the locator tomorrow.
+7. **Close.** Review the lowest-confidence heal first (Add to cart, 50%).
+
+## Video 2: Testing a RAG chatbot (about 10 minutes)
+
+1. **What RAG is.** Open **Help Center** and ask "Do you ship to Canada?" Point out the cited sources and retrieval scores.
+2. **Ground truth.** Expand the help documents at the bottom of the page. Every expected answer comes from them.
+3. **Retrieval tests.** Show `specs/rag.spec.ts`: the right document comes first, the retired 2024 policy is never used, and an out-of-scope question gets a refusal.
+4. **Plant the defects.** In **Training controls**, ask the same question with each defect:
+   - **Stale docs:** cites the retired policy and says 60 days.
+   - **No retrieval:** a confident answer with zero sources.
+   - **Hallucination:** an extra sentence about a lifetime warranty; the grounding badge drops.
+5. **Prove the checks work.** Show `support/rag-checks.ts` and the "planted defects are caught" tests. If a checker misses its defect, the test fails.
+6. **LLM mode.** Switch to **LLM (Workers AI)**. Wording changes between runs, so assert on properties (right source, citations, grounded), never exact text. Production suites replace the word-overlap check with an LLM-as-judge.
+
+## Exercises
+
+- "Can I use SAVE10 and FREESHIP together?" The answer leaves out the one-code-per-order rule. Write a test that catches incomplete answers.
+- Add a healer target for the promo code field and break it with UI v2.
+- Write a checkout test that uses `slow_user` and proves your waits are right.
+- Turn on Chaos mode (`X-Chaos: 1`) and add retries to the API tests without hiding real failures.
+
+## Test data
+
+| Item | Value |
+|---|---|
+| Password for all users | `practice123` |
+| Users | `standard_user`, `locked_user` (403), `slow_user` (+3 s), `error_user` (half of writes fail) |
+| Promo codes | `SAVE10`, `FREESHIP` |
+| Test cards | `4242 4242 4242 4242` succeeds, `4000 0000 0000 0002` is declined |
+| Out of stock | `p-1004`, `p-1011`, `p-1018` |
+| Isolated API cart | send any `X-Session-Id` header |
+
+Keep load tests against the live lab small. Run heavy k6 tests against a local copy.
+
+© 2026 QualityFirstQA LLC. Dhanoa Partners is a training brand of QualityFirstQA LLC. Created by Avneet Dhanoa. For personal learning; see LICENSE.

@@ -23,7 +23,8 @@ export default defineConfig({
   fullyParallel: true,
   workers: LOCAL ? undefined : 2,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['list'], ['html', { open: 'never' }], ['./support/healing-reporter.ts']],
+  // In CI the `github` reporter turns each failure into an annotation on the run.
+  reporter: [...(process.env.CI ? [['github'] as const] : []), ['list'], ['html', { open: 'never' }], ['./support/healing-reporter.ts']],
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',

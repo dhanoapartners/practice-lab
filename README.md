@@ -2,7 +2,7 @@
 
 Practice tests for **[Practice Lab](https://www.dhanoapartners.com)**, a demo store, UI playground, REST API and RAG help center built for automation training.
 
-This suite shows four things most tutorials skip:
+This suite shows eight things most tutorials skip:
 
 | Folder / file | What it demonstrates |
 |---|---|
@@ -10,6 +10,12 @@ This suite shows four things most tutorials skip:
 | `specs/rag.spec.ts`, `support/rag-checks.ts` | **Testing a RAG chatbot.** Retrieval, citations, refusals, and detectors for stale sources, missing retrieval and hallucinated claims. |
 | `specs/network.spec.ts` | **Network control.** Mocking responses, forcing errors, waiting on API calls and replaying traffic from a HAR file. |
 | `specs/api.spec.ts` | **API testing** with isolated sessions, auth tokens and validation errors. |
+| `specs/locators.spec.ts` | **15 chained-locator patterns**: scoping, `filter({ hasText / has / hasNot })`, `first/last/nth`, `or()`, `and()`, iframes, shadow DOM, walking up to a parent, visible-only matches, and chaining into SVG. |
+| `specs/svg.spec.ts` | **Reading SVG charts**: compare chart values with the API, read `data-*`, `aria-label` and `<text>`, hover tooltips, legend toggles, and the SVG element gallery. |
+| `specs/eval.spec.ts` | **LLM-as-judge.** Judging single answers, running a golden set, and calibrating the judge against human labels so planted judge defects are caught. |
+| `specs/agent.spec.ts` | **Testing AI agents.** Tool sequence, claimed vs actual actions, asking for missing input, prompt-injection resistance and step limits. |
+
+All test data is synthetic. The lab never uses real customer or personal data, and neither should your tests: generate or mock data instead.
 
 ## Setup
 
@@ -32,6 +38,7 @@ LAB_URL=http://localhost:8788 npm test
 | Command | What it shows |
 |---|---|
 | `npm test` | Every test on UI v1 |
+| `npm run test:live` | The same suite with 2 workers. Use it against the live site so the API rate limit (100 requests per 10 seconds) doesn't block the run. |
 | `npm run demo:broken` | Plain test-ID locators on UI v2: the test fails |
 | `npm run demo:healed` | The same journey with the healer on UI v2: it passes and writes `healing-report.md` |
 | `npm run har:record` | Records the catalog API to `fixtures/catalog.har`; the replay test uses it afterwards |
@@ -61,6 +68,22 @@ UI v2 simulates a release: test IDs and button labels change (`add-to-cart` beco
    - **Hallucination:** an extra sentence about a lifetime warranty; the grounding badge drops.
 5. **Prove the checks work.** Show `support/rag-checks.ts` and the "planted defects are caught" tests. If a checker misses its defect, the test fails.
 6. **LLM mode.** Switch to **LLM (Workers AI)**. Wording changes between runs, so assert on properties (right source, citations, grounded), never exact text. Production suites replace the word-overlap check with an LLM-as-judge.
+
+## Video 3: Who judges the judge? (about 8 minutes)
+
+1. Open **Eval Lab → Judge one answer** and judge the sample: it fails on groundedness because of the lifetime-warranty sentence.
+2. **Run the golden set** with no defect (90% or more), then with the Help Center's hallucination defect: the pass rate drops.
+3. **Calibrate the judge**: 100% agreement with the human labels. Plant **Lenient** and run it again: agreement falls and false passes appear.
+4. Show `specs/eval.spec.ts`: every judge defect must lower agreement, or the calibration set is too weak.
+
+## Video 4: Testing an AI agent (about 8 minutes)
+
+1. Open **AI Agent** and click "Add two Bluetooth speakers to my cart". Walk through the trace: search, add, confirm.
+2. Point at **Actually happened**, the real cart count. Never trust the reply alone.
+3. Plant **Wrong tool**: the reply still says "Added 2", but the cart did not change.
+4. Ask "Is the Bluetooth speaker any good?" A review hides instructions. With no defect the agent warns and ignores them; with **Prompt injection** it adds 3 rugs.
+5. Plant **Loop** with a step limit of 4: the agent stops at 4 steps.
+6. Show `specs/agent.spec.ts` and the **agent-trace-reviewer** skill.
 
 ## Exercises
 

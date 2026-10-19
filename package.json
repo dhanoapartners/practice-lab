@@ -8,7 +8,8 @@
     "demo:broken": "cross-env LAB_UI=v2 playwright test specs/shop.plain.spec.ts",
     "demo:healed": "cross-env LAB_UI=v2 playwright test specs/shop.healing.spec.ts",
     "har:record": "cross-env UPDATE_HAR=1 playwright test specs/network.spec.ts -g HAR",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "test:live": "playwright test --workers=2"
   },
   "devDependencies": {
     "@playwright/test": "1.48.2",

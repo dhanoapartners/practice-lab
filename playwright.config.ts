@@ -10,7 +10,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never' }], ['./support/healing-reporter.ts']],
   use: {
-    baseURL: process.env.LAB_URL || 'https://lab.dhanoapartners.com',
+    baseURL: process.env.LAB_URL || 'https://www.dhanoapartners.com',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     // Optional: point at an already-installed Chromium instead of `npx playwright install`.

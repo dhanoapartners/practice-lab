@@ -1,6 +1,6 @@
 # Practice Lab: Playwright test suite
 
-Practice tests for **[Practice Lab](https://lab.dhanoapartners.com)**, a demo store, UI playground, REST API and RAG help center built for automation training.
+Practice tests for **[Practice Lab](https://www.dhanoapartners.com)**, a demo store, UI playground, REST API and RAG help center built for automation training.
 
 This suite shows four things most tutorials skip:
 

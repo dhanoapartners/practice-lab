@@ -2,7 +2,7 @@
 
 Practice tests for **[Practice Lab](https://www.dhanoapartners.com)**, a demo store, UI playground, REST API and RAG help center built for automation training.
 
-This suite shows eight things most tutorials skip:
+This suite shows nine things most tutorials skip:
 
 | Folder / file | What it demonstrates |
 |---|---|
@@ -14,6 +14,7 @@ This suite shows eight things most tutorials skip:
 | `specs/svg.spec.ts` | **Reading SVG charts**: compare chart values with the API, read `data-*`, `aria-label` and `<text>`, hover tooltips, legend toggles, and the SVG element gallery. |
 | `specs/eval.spec.ts` | **LLM-as-judge.** Judging single answers, running a golden set, and calibrating the judge against human labels so planted judge defects are caught. |
 | `specs/agent.spec.ts` | **Testing AI agents.** Tool sequence, claimed vs actual actions, asking for missing input, prompt-injection resistance and step limits. |
+| `specs/bank.spec.ts` | **Testing a bank (Harbor Demo Bank).** Balances and running balance, pending-to-posted transfers, idempotency keys, daily-limit boundaries, a loan application wizard, a rate engine checked against the amortization formula, a payments sandbox (declines, one-time code, refunds, out-of-order webhooks) and four planted money bugs. |
 
 All test data is synthetic. The lab never uses real customer or personal data, and neither should your tests: generate or mock data instead.
 
@@ -85,11 +86,31 @@ UI v2 simulates a release: test IDs and button labels change (`add-to-cart` beco
 5. Plant **Loop** with a step limit of 4: the agent stops at 4 steps.
 6. Show `specs/agent.spec.ts` and the **agent-trace-reviewer** skill.
 
+## Video 5: Testing a bank (about 12 minutes)
+
+Harbor Demo Bank is fictional: the customer (Jordan Rivera), accounts, merchants and cards are all synthetic.
+
+1. **Accounts.** Open **Bank**. Point out balance vs available on checking, and balance owed vs available credit on the card.
+2. **Statements.** Search "payroll": 6 rows, $14,100.00 in. The newest row's running balance equals the account balance. Download the CSV and count the lines.
+3. **Transfers.** Move $120.50 to savings. Show the review step and the Idempotency-Key. Double-click Confirm: one transfer, not two. Watch it go from pending to posted.
+4. **Boundaries.** Daily limit $2,500.00: exactly $2,500.00 passes, $0.01 more fails. Amounts with 3 decimals fail. Schedule a transfer for next week and cancel it.
+5. **Loan application.** Walk the five steps. Show the age rule, the employer field that disappears for retirees, and the vehicle section that only appears for auto loans. Save a draft, then submit: approved at 6.99%, $494.91 a month.
+6. **Rate calculator.** Change the credit score and watch the APR and breakdown change. Show the test computing the payment with its own amortization formula instead of trusting the screen.
+7. **Payments sandbox.** Use the test-card table: success, decline, one-time code (123456), a card that settles a few seconds later, a partial refund, and webhook events that arrive out of order.
+8. **Plant the defects.** In **Training controls**, plant each defect and run `specs/bank.spec.ts -g "Planted"`:
+   - **Double post:** one click books two transfers.
+   - **Limit off by one:** $2,500.01 is accepted.
+   - **Rounding:** $20,000 over 60 months shows $393.57 instead of $393.58.
+   - **Stale balance:** available balance does not drop after a transfer.
+   Each check runs twice: it must pass on the correct bank and fail with its defect. A check that passes with the defect on is too weak.
+
 ## Exercises
 
 - "Can I use SAVE10 and FREESHIP together?" The answer leaves out the one-code-per-order rule. Write a test that catches incomplete answers.
 - Add a healer target for the promo code field and break it with UI v2.
 - Write a checkout test that uses `slow_user` and proves your waits are right.
+- Bank: write a test that proves savings allows only 6 withdrawals a month, then plant `limit_off_by_one` and decide whether your test should catch it.
+- Bank: with `X-Bank-Bug: double_post`, find the duplicate charge in the payments list using only the UI.
 - Turn on Chaos mode (`X-Chaos: 1`) and add retries to the API tests without hiding real failures.
 
 ## Test data
@@ -102,6 +123,9 @@ UI v2 simulates a release: test IDs and button labels change (`add-to-cart` beco
 | Test cards | `4242 4242 4242 4242` succeeds, `4000 0000 0000 0002` is declined |
 | Out of stock | `p-1004`, `p-1011`, `p-1018` |
 | Isolated API cart | send any `X-Session-Id` header |
+| Bank customer | Jordan Rivera, C-000417 (fictional). Seed: checking $7,707.30, savings $9,488.57, card owes $1,325.94 |
+| Bank test cards | `4242…4242` succeeds, `4000…0002` declined, `4000…9995` insufficient funds, `4000…3220` needs code `123456`, `4000…1976` settles later, `4100…0019` blocked |
+| Bank defects | header `X-Bank-Bug`: `double_post`, `limit_off_by_one`, `rounding`, `stale_balance` |
 
 Keep load tests against the live lab small. Run heavy k6 tests against a local copy.
 

@@ -43,6 +43,25 @@ test.describe('Navigation', () => {
   });
 });
 
+/** Session handling: one visitor must get exactly one session. */
+test.describe('Session', () => {
+  test('first page load creates exactly one session, even with parallel API calls', async ({ page }) => {
+    // Regression test: the Bank screen fires several API calls at once on load. Before the fix,
+    // each created its own session and a late response could swap the cookie mid-visit.
+    const sids = new Set<string>();
+    page.on('response', async (r) => {
+      const c = await r.headerValue('set-cookie');
+      const m = c && c.match(/lab_sid=([^;]+)/);
+      if (m) sids.add(m[1]);
+    });
+    await page.goto(labUrl('bank'));
+    await expect(page.getByTestId('account-card')).toHaveCount(3);
+    await page.getByTestId('bank-tab-transfer').click();
+    await expect(page.getByTestId('transfer-limit-remaining')).toHaveText('$2,500.00');
+    expect(sids.size).toBe(1);
+  });
+});
+
 /** Test IDs overlay, UI version switch, Chaos toggle and Reset data. */
 test.describe('Header tools', () => {
   test('Test IDs overlay outlines elements and names them on hover', async ({ page }) => {

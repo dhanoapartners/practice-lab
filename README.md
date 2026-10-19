@@ -2,7 +2,7 @@
 
 [![Playwright](https://github.com/dhanoapartners/practice-lab/actions/workflows/playwright.yml/badge.svg)](https://github.com/dhanoapartners/practice-lab/actions/workflows/playwright.yml)
 
-A complete Playwright + TypeScript suite for **[Practice Lab](https://www.dhanoapartners.com)**, a training site with a demo store, a UI playground, a REST API, SVG charts, a RAG help center, an LLM-as-judge lab, an AI agent and a fictional bank. Every screen and API on the site has tests here: **255 tests** in 16 spec files, documented with JSDoc and run nightly in GitHub Actions.
+A complete Playwright + TypeScript suite for **[Practice Lab](https://www.dhanoapartners.com)**, a training site with a demo store, a UI playground, a REST API, SVG charts, a RAG help center, an LLM-as-judge lab, an AI agent and a fictional bank. Every screen and API on the site has tests here: **257 tests** in 16 spec files, documented with JSDoc and run nightly in GitHub Actions.
 
 All test data is synthetic. The lab never uses real customer or personal data, and neither should your tests: generate or mock data instead.
 
@@ -14,13 +14,13 @@ All test data is synthetic. The lab never uses real customer or personal data, a
 | `specs/checkout.spec.ts` | 21 | Cart lines, merge, remove-with-confirm, totals checked against an independent pricing model, SAVE10 and FREESHIP, all four checkout steps with every validation message, sign-in, and the `locked_user`, `slow_user` and `error_user` behaviors. |
 | `specs/playground.spec.ts` | 41 | Every Playground tile: click types, delayed buttons, modals, inputs, native, multi and custom dropdowns, checkboxes, pickers, dynamic loading, progress, changing elements, drag and drop, keys, infinite scroll, accordion, upload, downloads, new tab, popup, iframe, shadow DOM, visual change and the sortable table. |
 | `specs/hover.spec.ts` | 9 | Hover menus, tooltips, the site-wide hover text, and keyboard access to all of them. |
-| `specs/site.spec.ts` | 30 | Navigation and deep links, the Test IDs overlay, UI v2 switch, Chaos toggle, Reset data, the in-browser API console, the Help Center page, Skills downloads, Coaching, Terms and the footer. |
+| `specs/site.spec.ts` | 31 | Navigation and deep links, the Test IDs overlay, UI v2 switch, Chaos toggle, Reset data, the in-browser API console, the Help Center page, Skills downloads, Coaching, Terms and the footer. |
 | `specs/a11y.spec.ts` | 12 | axe-core scans of every screen, proof that axe finds the four planted bugs, and a keyboard-only purchase. |
 | `specs/api.spec.ts` | 23 | Products (filters, sort, paging, lookups), reviews, store availability, auth, cart writes, promo codes, order rules, reset, 404 shapes, and chaos mode with a retry that only retries 503. |
 | `specs/network.spec.ts` | 4 | Mocking responses, forcing errors, waiting on API calls and replaying traffic from a HAR file. |
 | `specs/locators.spec.ts` | 15 | Chained-locator patterns: scoping, `filter({ hasText / has / hasNot })`, `first/last/nth`, `or()`, `and()`, iframes, shadow DOM, parents, visible-only, SVG. |
 | `specs/svg.spec.ts` | 15 | Chart values vs the API, `data-*`, `aria-label` and `<text>`, tooltips, legend toggles and the SVG element gallery. |
-| `specs/bank.spec.ts` | 34 | Harbor Demo Bank: balances, running balance, pending-to-posted transfers, idempotency keys, limits, loan wizard, rate engine vs the amortization formula, payments sandbox, webhooks, and four planted money bugs. |
+| `specs/bank.spec.ts` | 35 | Harbor Demo Bank: balances, running balance, pending-to-posted transfers, idempotency keys, limits, loan wizard, rate engine vs the amortization formula, payments sandbox, webhooks, and four planted money bugs. |
 | `specs/rag.spec.ts` | 7 | RAG help bot: retrieval, citations, refusals, and detectors for stale sources, missing retrieval and hallucinated claims. |
 | `specs/eval.spec.ts` | 10 | LLM-as-judge: judging answers, the golden set, and calibrating the judge against human labels. |
 | `specs/agent.spec.ts` | 7 | AI agent: tool sequence, claimed vs actual actions, prompt-injection resistance and step limits. |

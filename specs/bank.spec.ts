@@ -430,6 +430,16 @@ test.describe('Bank UI', () => {
     expect(seqs).toEqual([4, 3, 2, 1]);
   });
 
+  test('transfer list shows an error and recovers when the API fails', async ({ page }) => {
+    let failures = 2; // first load and its automatic retry both fail
+    await page.route('**/api/v1/bank/transfers', (route) =>
+      route.request().method() === 'GET' && failures-- > 0 ? route.fulfill({ status: 500, json: { error: 'Server error' } }) : route.fallback());
+    await page.getByTestId('bank-tab-transfer').click();
+    await expect(page.getByTestId('transfer-list-error')).toContainText('Could not load transfers (500)');
+    await page.getByTestId('transfer-list-retry').click();
+    await expect(page.getByTestId('transfer-empty')).toBeVisible();
+  });
+
   test('UI catches a planted double post', async ({ page }) => {
     await page.getByTestId('bank-bug').selectOption('double_post');
     await expect(page.getByTestId('bank-bug-active')).toHaveText('Defect: double_post');

@@ -1,3 +1,7 @@
+/**
+ * @file Playwright reporter that turns self-heals into healing-report.md and healing-report.json.
+ * Registered in playwright.config.ts.
+ */
 import type { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import { writeFileSync } from 'node:fs';
 import type { HealEvent } from './healer';
@@ -10,12 +14,14 @@ import type { HealEvent } from './healer';
 export default class HealingReporter implements Reporter {
   private events: HealEvent[] = [];
 
+  /** Collects `self-healed` attachments from each finished test. */
   onTestEnd(_test: TestCase, result: TestResult) {
     for (const a of result.attachments) {
       if (a.name === 'self-healed' && a.body) this.events.push(JSON.parse(a.body.toString()));
     }
   }
 
+  /** Writes both report files once the run ends, if anything healed. */
   onEnd() {
     if (!this.events.length) return;
     const unique = new Map<string, HealEvent>();

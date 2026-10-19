@@ -1,12 +1,26 @@
+/**
+ * @file Testing a RAG help bot: retrieval, citations, refusals and planted defects.
+ *
+ * Detectors in support/rag-checks.ts flag stale sources, answers with no retrieval and unsupported claims.
+ * Run: `npx playwright test specs/rag.spec.ts`. Add `LAB_LLM=1` to include the LLM-mode test.
+ */
 import { test, expect } from '@playwright/test';
 import { ragIssues, REFUSAL, type RagAnswer } from '../support/rag-checks';
 
+/**
+ * Asks the Help Center a question through the API.
+ * @param request Playwright API request context.
+ * @param question The user's question.
+ * @param extra Optional settings: `bug`, `mode`, `k`.
+ * @returns The answer with its citations.
+ */
 const ask = async (request: any, question: string, extra: Record<string, unknown> = {}): Promise<RagAnswer> => {
   const r = await request.post('/api/v1/help/ask', { data: { question, mode: 'extractive', ...extra } });
   expect(r.status()).toBe(200);
   return r.json();
 };
 
+/** With no defect: right document first, never the retired policy, refuses what the docs can't answer. */
 test.describe('RAG help center: correct behavior', () => {
   test('retrieves the right document and cites it', async ({ request }) => {
     const a = await ask(request, 'How long is the warranty on electronics?');
@@ -31,6 +45,7 @@ test.describe('RAG help center: correct behavior', () => {
 
 // Each planted defect must be caught by ragIssues(). If a detector misses its
 // defect, the test fails, which is how you prove your checks actually work.
+/** Each planted RAG defect must be flagged by ragIssues(). */
 test.describe('RAG help center: planted defects are caught', () => {
   const cases = [
     { bug: 'stale', q: 'How many days do I have to return an item?', expect: 'stale-source' },
@@ -46,6 +61,7 @@ test.describe('RAG help center: planted defects are caught', () => {
 });
 
 // Generated answers vary run to run, so assert on properties, not exact text.
+/** Generated wording changes between runs, so assert on properties, never exact text. */
 test.describe('RAG help center: LLM mode', () => {
   test.skip(!process.env.LAB_LLM, 'Set LAB_LLM=1 against a deployment with Workers AI');
   test('LLM answer is grounded in its sources', async ({ request }) => {

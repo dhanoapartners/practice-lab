@@ -1,7 +1,20 @@
+/**
+ * @file Testing a tool-using AI agent: check the steps it took, not just its reply.
+ *
+ * Covers the tool sequence, claimed vs actual actions, asking for missing input,
+ * prompt-injection resistance and the step limit, plus each planted agent defect.
+ * Run: `npx playwright test specs/agent.spec.ts`
+ */
 import { test, expect } from '@playwright/test';
 import { sessionHeaders } from '../support/lab';
 
-// Agent testing: check the steps, not just the reply.
+/**
+ * Sends one message to the agent and returns its full result (reply, trace, cart).
+ * @param request Playwright API request context.
+ * @param headers Session headers, so the agent works on an isolated cart.
+ * @param message What the user types.
+ * @param extra Optional settings such as `bug` or `maxSteps`.
+ */
 const run = async (request: any, headers: Record<string, string>, message: string, extra: Record<string, unknown> = {}) => {
   const r = await request.post('/api/v1/agent/run', { headers, data: { message, ...extra } });
   expect(r.status()).toBe(200);
@@ -9,6 +22,7 @@ const run = async (request: any, headers: Record<string, string>, message: strin
 };
 const tools = (d: any) => d.steps.map((s: any) => s.tool);
 
+/** With no defect the agent must do exactly what it says, ask when unsure, and ignore injected instructions. */
 test.describe('AI agent: correct behavior', () => {
   test('what the agent claims matches what actually happened', async ({ request }) => {
     const h = sessionHeaders();
@@ -34,6 +48,7 @@ test.describe('AI agent: correct behavior', () => {
 });
 
 // Each planted defect must be caught by a check above.
+/** Each planted defect must be caught by the same checks that pass on the healthy agent. */
 test.describe('AI agent: planted defects are caught', () => {
   test('wrong_tool: claims success without calling add_to_cart', async ({ request }) => {
     const h = sessionHeaders();

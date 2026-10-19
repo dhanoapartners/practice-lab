@@ -1,8 +1,14 @@
+/**
+ * @file Reading values out of SVG charts, and working with common SVG elements.
+ *
+ * Compares chart values with the API, reads data-*, aria-label and <text>, hovers tooltips,
+ * toggles legend series and exercises the 24-element SVG gallery.
+ * Run: `npx playwright test specs/svg.spec.ts`
+ */
 import { test, expect } from '@playwright/test';
 import { labUrl } from '../support/lab';
 
-// Reading values out of SVG charts, and working with common SVG elements.
-
+/** Bar, line and donut charts on the Charts page. */
 test.describe('SVG charts', () => {
   test('bar values on screen match the API', async ({ page, request }) => {
     const api = await (await request.get('/api/v1/charts/sales', { params: { year: '2026' } })).json();
@@ -70,6 +76,7 @@ test.describe('SVG charts', () => {
   });
 });
 
+/** One example per common SVG element. */
 test.describe('SVG element gallery', () => {
   test.beforeEach(async ({ page }) => { await page.goto(labUrl('charts')); });
 

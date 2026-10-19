@@ -1,18 +1,28 @@
 {
   "name": "practice-lab-tests",
   "private": true,
-  "description": "Playwright starter suite for Practice Lab: self-healing locators, API, network mocking, HAR and RAG checks.",
+  "description": "Playwright + TypeScript test suite for Practice Lab (dhanoapartners.com): UI, API, accessibility, self-healing locators, RAG, LLM-as-judge, AI agent and banking tests.",
   "scripts": {
     "test": "playwright test",
+    "test:local": "cross-env LAB_URL=http://localhost:8788 playwright test",
     "test:v2": "cross-env LAB_UI=v2 playwright test",
+    "test:ui": "playwright test specs/shop.spec.ts specs/checkout.spec.ts specs/playground.spec.ts specs/hover.spec.ts specs/site.spec.ts",
+    "test:api": "playwright test specs/api.spec.ts specs/bank.spec.ts -g API",
+    "test:ai": "playwright test specs/rag.spec.ts specs/eval.spec.ts specs/agent.spec.ts",
+    "test:a11y": "playwright test specs/a11y.spec.ts",
+    "test:bank": "playwright test specs/bank.spec.ts",
     "demo:broken": "cross-env LAB_UI=v2 playwright test specs/shop.plain.spec.ts",
     "demo:healed": "cross-env LAB_UI=v2 playwright test specs/shop.healing.spec.ts",
     "har:record": "cross-env UPDATE_HAR=1 playwright test specs/network.spec.ts -g HAR",
+    "typecheck": "tsc -p .",
     "report": "playwright show-report",
     "test:live": "playwright test --workers=2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.10.1",
     "@playwright/test": "1.48.2",
-    "cross-env": "7.0.3"
+    "@types/node": "20.16.11",
+    "cross-env": "7.0.3",
+    "typescript": "5.6.3"
   }
 }

@@ -1,7 +1,13 @@
+/**
+ * @file Network control: mock responses, force errors, wait on API calls and replay a HAR file.
+ *
+ * Run: `npx playwright test specs/network.spec.ts`. Record the HAR first with `npm run har:record`.
+ */
 import { test, expect } from '@playwright/test';
 import { existsSync } from 'node:fs';
 import { labUrl } from '../support/lab';
 
+/** page.route, waitForResponse and routeFromHAR against the shop. */
 test.describe('network control', () => {
   test('mock an empty catalog', async ({ page }) => {
     await page.route('**/api/v1/products?*', (route) => route.fulfill({ json: { total: 0, page: 1, limit: 8, pages: 1, items: [] } }));

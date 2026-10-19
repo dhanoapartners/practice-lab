@@ -1,14 +1,23 @@
+/**
+ * @file Harbor Demo Bank: a fictional bank for financial-services testing.
+ *
+ * Every customer, account, merchant and card is synthetic. Seed history (Jul–Sep 2026) never
+ * changes, so balances below are stable. Each test gets its own session, so transfers and
+ * payments never leak between tests.
+ * Run: `npx playwright test specs/bank.spec.ts`
+ */
 import { test, expect, APIRequestContext } from '@playwright/test';
 import { labUrl, sessionHeaders } from '../support/lab';
 
-// Harbor Demo Bank: a fictional bank. Every customer, account, merchant and card is synthetic.
-// Seed history (Jul–Sep 2026) never changes, so balances below are stable.
-// Each test gets its own session, so transfers and payments never leak between tests.
-
+/** Base path of the bank API. */
 const BANK = '/api/v1/bank';
+/** Balances produced by the fixed seed history. */
 const SEED = { checking: 7707.3, savings: 9488.57, cardOwed: 1325.94, cardAvailable: 3674.06 };
+/** Today's date in UTC as YYYY-MM-DD, matching the bank's clock. */
 const today = () => new Date().toISOString().slice(0, 10);
+/** A date `n` days from today (negative for the past), as YYYY-MM-DD. */
 const plusDays = (n: number) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+/** A fresh Idempotency-Key. */
 const key = () => crypto.randomUUID();
 
 /** Standard amortization, rounded half-up to the cent. Computed independently of the bank. */
@@ -18,7 +27,11 @@ function expectedPayment(amount: number, aprPct: number, months: number) {
   return Math.round((raw + Number.EPSILON) * 100) / 100;
 }
 
-/** A small API client bound to one isolated session and, optionally, one planted defect. */
+/**
+ * A small API client bound to one isolated session and, optionally, one planted defect.
+ * @param request Playwright API request context.
+ * @param bug A defect to plant on every call via `X-Bank-Bug` (`none` for the correct bank).
+ */
 function bank(request: APIRequestContext, bug = 'none') {
   const headers = { ...sessionHeaders(), ...(bug !== 'none' ? { 'X-Bank-Bug': bug } : {}) };
   return {
@@ -35,9 +48,11 @@ function bank(request: APIRequestContext, bug = 'none') {
     del: (path: string) => request.delete(BANK + path, { headers }),
   };
 }
+/** A test card with a future expiry and CVC 123. */
 const card = (number: string) => ({ number, expMonth: 12, expYear: new Date().getUTCFullYear() + 2, cvc: '123' });
 
 // ---------------------------------------------------------------- API
+/** Balances, statements, transfers, pricing, loans and the payments sandbox through the API. */
 test.describe('Bank API', () => {
   test('seed balances are stable', async ({ request }) => {
     const a = await bank(request).accounts();
@@ -242,6 +257,7 @@ test.describe('Planted bank defects are caught', () => {
 });
 
 // ---------------------------------------------------------------- UI
+/** The same flows through the Bank screens. */
 test.describe('Bank UI', () => {
   test.beforeEach(async ({ page }) => { await page.goto(labUrl('bank')); });
 

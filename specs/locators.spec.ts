@@ -1,9 +1,14 @@
+/**
+ * @file Fifteen chained-locator patterns: narrow down step by step instead of writing one long selector.
+ *
+ * Scoping, filter({ hasText / has / hasNot }), first/last/nth, or(), and(), iframes, shadow DOM,
+ * walking up to a parent, visible-only matches and chaining into SVG.
+ * Run: `npx playwright test specs/locators.spec.ts`
+ */
 import { test, expect } from '@playwright/test';
 import { labUrl } from '../support/lab';
 
-// Chained locators: narrow down step by step instead of writing one long selector.
-// Every example runs against the live Practice Lab with synthetic data.
-
+/** Find a container first, then look inside it. */
 test.describe('Chaining: scope, then find', () => {
   test('1. Scope to a container, then find inside it', async ({ page }) => {
     await page.goto(labUrl('playground'));
@@ -35,6 +40,7 @@ test.describe('Chaining: scope, then find', () => {
   });
 });
 
+/** Pick among many similar elements by what they contain or don't contain. */
 test.describe('Chaining with filter()', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(labUrl('shop'));
@@ -79,6 +85,7 @@ test.describe('Chaining with filter()', () => {
   });
 });
 
+/** Position, alternatives (or), intersections (and), parents and visibility. */
 test.describe('Combining locators', () => {
   test('11. or(): one locator that works on UI v1 and v2', async ({ page }) => {
     await page.goto('/?ui=v2#shop');

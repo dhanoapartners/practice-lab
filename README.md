@@ -1,22 +1,48 @@
 # Practice Lab: Playwright test suite
 
-Practice tests for **[Practice Lab](https://www.dhanoapartners.com)**, a demo store, UI playground, REST API and RAG help center built for automation training.
+[![Playwright](https://github.com/dhanoapartners/practice-lab/actions/workflows/playwright.yml/badge.svg)](https://github.com/dhanoapartners/practice-lab/actions/workflows/playwright.yml)
 
-This suite shows nine things most tutorials skip:
-
-| Folder / file | What it demonstrates |
-|---|---|
-| `support/healer.ts`, `support/healing-reporter.ts` | **Self-healing locators.** When a release renames a test ID, the healer finds the element by role, text, CSS or similarity, keeps the test green and writes a report of what to fix. |
-| `specs/rag.spec.ts`, `support/rag-checks.ts` | **Testing a RAG chatbot.** Retrieval, citations, refusals, and detectors for stale sources, missing retrieval and hallucinated claims. |
-| `specs/network.spec.ts` | **Network control.** Mocking responses, forcing errors, waiting on API calls and replaying traffic from a HAR file. |
-| `specs/api.spec.ts` | **API testing** with isolated sessions, auth tokens and validation errors. |
-| `specs/locators.spec.ts` | **15 chained-locator patterns**: scoping, `filter({ hasText / has / hasNot })`, `first/last/nth`, `or()`, `and()`, iframes, shadow DOM, walking up to a parent, visible-only matches, and chaining into SVG. |
-| `specs/svg.spec.ts` | **Reading SVG charts**: compare chart values with the API, read `data-*`, `aria-label` and `<text>`, hover tooltips, legend toggles, and the SVG element gallery. |
-| `specs/eval.spec.ts` | **LLM-as-judge.** Judging single answers, running a golden set, and calibrating the judge against human labels so planted judge defects are caught. |
-| `specs/agent.spec.ts` | **Testing AI agents.** Tool sequence, claimed vs actual actions, asking for missing input, prompt-injection resistance and step limits. |
-| `specs/bank.spec.ts` | **Testing a bank (Harbor Demo Bank).** Balances and running balance, pending-to-posted transfers, idempotency keys, daily-limit boundaries, a loan application wizard, a rate engine checked against the amortization formula, a payments sandbox (declines, one-time code, refunds, out-of-order webhooks) and four planted money bugs. |
+A complete Playwright + TypeScript suite for **[Practice Lab](https://www.dhanoapartners.com)**, a training site with a demo store, a UI playground, a REST API, SVG charts, a RAG help center, an LLM-as-judge lab, an AI agent and a fictional bank. Every screen and API on the site has tests here: **255 tests** in 16 spec files, documented with JSDoc and run nightly in GitHub Actions.
 
 All test data is synthetic. The lab never uses real customer or personal data, and neither should your tests: generate or mock data instead.
+
+## What is covered
+
+| Spec | Tests | What it covers |
+|---|---:|---|
+| `specs/shop.spec.ts` | 24 | Search suggestions (keyboard, highlight, no results), category and color multi-selects, price slider, rating and stock filters, sorting, paging, and the product page (variants, sizes, quantity rules, store pickup, tabs, paged reviews, wishlist). |
+| `specs/checkout.spec.ts` | 21 | Cart lines, merge, remove-with-confirm, totals checked against an independent pricing model, SAVE10 and FREESHIP, all four checkout steps with every validation message, sign-in, and the `locked_user`, `slow_user` and `error_user` behaviors. |
+| `specs/playground.spec.ts` | 41 | Every Playground tile: click types, delayed buttons, modals, inputs, native, multi and custom dropdowns, checkboxes, pickers, dynamic loading, progress, changing elements, drag and drop, keys, infinite scroll, accordion, upload, downloads, new tab, popup, iframe, shadow DOM, visual change and the sortable table. |
+| `specs/hover.spec.ts` | 9 | Hover menus, tooltips, the site-wide hover text, and keyboard access to all of them. |
+| `specs/site.spec.ts` | 30 | Navigation and deep links, the Test IDs overlay, UI v2 switch, Chaos toggle, Reset data, the in-browser API console, the Help Center page, Skills downloads, Coaching, Terms and the footer. |
+| `specs/a11y.spec.ts` | 12 | axe-core scans of every screen, proof that axe finds the four planted bugs, and a keyboard-only purchase. |
+| `specs/api.spec.ts` | 23 | Products (filters, sort, paging, lookups), reviews, store availability, auth, cart writes, promo codes, order rules, reset, 404 shapes, and chaos mode with a retry that only retries 503. |
+| `specs/network.spec.ts` | 4 | Mocking responses, forcing errors, waiting on API calls and replaying traffic from a HAR file. |
+| `specs/locators.spec.ts` | 15 | Chained-locator patterns: scoping, `filter({ hasText / has / hasNot })`, `first/last/nth`, `or()`, `and()`, iframes, shadow DOM, parents, visible-only, SVG. |
+| `specs/svg.spec.ts` | 15 | Chart values vs the API, `data-*`, `aria-label` and `<text>`, tooltips, legend toggles and the SVG element gallery. |
+| `specs/bank.spec.ts` | 34 | Harbor Demo Bank: balances, running balance, pending-to-posted transfers, idempotency keys, limits, loan wizard, rate engine vs the amortization formula, payments sandbox, webhooks, and four planted money bugs. |
+| `specs/rag.spec.ts` | 7 | RAG help bot: retrieval, citations, refusals, and detectors for stale sources, missing retrieval and hallucinated claims. |
+| `specs/eval.spec.ts` | 10 | LLM-as-judge: judging answers, the golden set, and calibrating the judge against human labels. |
+| `specs/agent.spec.ts` | 7 | AI agent: tool sequence, claimed vs actual actions, prompt-injection resistance and step limits. |
+| `specs/shop.plain.spec.ts`, `specs/shop.healing.spec.ts` | 3 | The self-healing locator demo: the same journey with plain locators (breaks on UI v2) and with the healer (passes and writes a report). |
+
+Helpers live in `support/`:
+
+| File | Purpose |
+|---|---|
+| `healer.ts`, `healing-reporter.ts`, `locators.ts` | Self-healing locators: role → text → CSS → similarity fallbacks, and a report of every heal. |
+| `pricing.ts` | An independent copy of the store's pricing rules, so totals are computed by the test, not copied from the page. |
+| `rag-checks.ts` | Groundedness and citation checks for RAG answers. |
+| `lab.ts` | `labUrl()` for screens and `sessionHeaders()` for isolated API sessions. |
+
+## How the tests are written
+
+- **Stable locators.** Test IDs first, then roles and labels. No XPath, no CSS chains tied to layout.
+- **No sleeps.** Every wait is an assertion that retries (`toHaveText`, `toBeEnabled`, `expect.poll`).
+- **Isolated data.** Each test gets its own session (cookie or `X-Session-Id`), so the suite runs fully in parallel.
+- **Independent oracles.** Money, loan payments and sort orders are computed by the test, then compared with the site.
+- **Every checker is tested.** Planted defects (RAG, judge, agent, bank) must be caught, and the same check must pass on the healthy system.
+- **JSDoc everywhere.** Each spec starts with a `@file` block saying what it covers and how to run it; helpers document their parameters and return values.
 
 ## Setup
 
@@ -28,7 +54,7 @@ npx playwright install chromium
 npm test
 ```
 
-Tests run against the live lab by default. To use a local copy of the site instead:
+Tests run against the live lab by default, with 2 workers so the site's rate limit (100 API requests per 10 seconds per IP) doesn't block the run. To use a local copy of the site with full parallelism:
 
 ```bash
 LAB_URL=http://localhost:8788 npm test
@@ -36,15 +62,25 @@ LAB_URL=http://localhost:8788 npm test
 
 ## Commands
 
-| Command | What it shows |
+| Command | What it runs |
 |---|---|
 | `npm test` | Every test on UI v1 |
-| `npm run test:live` | The same suite with 2 workers. Use it against the live site so the API rate limit (100 requests per 10 seconds) doesn't block the run. |
+| `npm run test:ui` | Shop, checkout, Playground, hover and site tests |
+| `npm run test:api` | REST API tests for the shop and the bank |
+| `npm run test:ai` | RAG, LLM-as-judge and agent tests |
+| `npm run test:a11y` | Accessibility scans |
+| `npm run test:bank` | Harbor Demo Bank, API and UI |
+| `npm run typecheck` | TypeScript strict-mode check of every file |
 | `npm run demo:broken` | Plain test-ID locators on UI v2: the test fails |
 | `npm run demo:healed` | The same journey with the healer on UI v2: it passes and writes `healing-report.md` |
 | `npm run har:record` | Records the catalog API to `fixtures/catalog.har`; the replay test uses it afterwards |
 | `LAB_LLM=1 npm test` | Adds the LLM-mode RAG test (uses the live lab's Workers AI) |
+| `VISUAL=1 npm test` | Adds the baseline screenshot test (`--update-snapshots` on the first run) |
 | `npm run report` | Opens the HTML report |
+
+## Continuous integration
+
+`.github/workflows/playwright.yml` runs the typecheck and the full suite on every push, on pull requests and every night at 09:17 UTC. The HTML report is attached to each run for 14 days.
 
 UI v2 simulates a release: test IDs and button labels change (`add-to-cart` becomes `add-to-bag`, "Add to cart" becomes "Add to bag"). Switch it in the lab's header or with `?ui=v2`.
 

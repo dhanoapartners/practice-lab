@@ -1,3 +1,14 @@
+/**
+ * @file Self-healing locators for Playwright.
+ *
+ * Import `test` and `expect` from this file instead of `@playwright/test` to get the `heal` fixture.
+ * @example
+ * import { test, expect } from '../support/healer';
+ * import { L } from '../support/locators';
+ * test('add to cart', async ({ page, heal }) => {
+ *   await (await heal(L.addToCart)).click();
+ * });
+ */
 import { test as base, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 
 /**
@@ -11,15 +22,23 @@ import { test as base, expect, type Locator, type Page, type TestInfo } from '@p
  * list it and suggest the locator fix. Heals never pass silently.
  */
 export type Target = {
+  /** Short name used in logs and the healing report, e.g. `addToCart`. */
   key: string;
+  /** Primary locator: the element's `data-testid`. */
   testId: string;
+  /** ARIA role for the first fallback, e.g. `button`. */
   role?: Parameters<Page['getByRole']>[0];
+  /** Extra getByRole options such as `{ level: 1 }` for headings. */
   roleOptions?: Omit<NonNullable<Parameters<Page['getByRole']>[1]>, 'name'>;
+  /** Accessible name used with `role`. */
   name?: string | RegExp;
+  /** Exact visible text for the second fallback. */
   text?: string;
+  /** A stable CSS selector for the third fallback. */
   css?: string;
 };
 
+/** One heal, attached to the test result and collected by the healing reporter. */
 export type HealEvent = {
   key: string;
   broken: string;
@@ -31,11 +50,16 @@ export type HealEvent = {
   url: string;
 };
 
+/** How long to wait for the primary test ID before healing (ms). */
 const PRIMARY_WAIT = 2000;
+/** How long each fallback strategy may wait (ms). */
 const FALLBACK_WAIT = 1500;
+/** Below this similarity score the healer gives up and fails the test. */
 const MIN_SIMILARITY = 0.45;
 
+/** Splits a string into lowercase words, e.g. `add-to-cart` → [add, to, cart]. */
 const words = (s = '') => s.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+/** Jaccard similarity of two word lists: shared words ÷ all distinct words (0 to 1). */
 function jaccard(a: string[], b: string[]) {
   if (!a.length || !b.length) return 0;
   const A = new Set(a), B = new Set(b);
@@ -43,13 +67,25 @@ function jaccard(a: string[], b: string[]) {
   return inter / new Set([...A, ...B]).size;
 }
 
+/** True if the locator reaches `state` within `timeout` ms; never throws. */
 async function present(loc: Locator, timeout: number, state: 'attached' | 'visible' = 'attached') {
   try { await loc.first().waitFor({ state, timeout }); return true; } catch { return false; }
 }
-// Fallbacks only accept visible matches. Without this, getByRole('option')
-// can "heal" onto a hidden <option> in an unrelated <select>.
+/**
+ * Restricts a locator to visible matches. Fallbacks need this: without it, getByRole('option')
+ * can "heal" onto a hidden <option> in an unrelated <select>.
+ */
 const visibleOnly = (loc: Locator) => loc.locator('visible=true');
 
+/**
+ * Finds an element by its test ID, falling back to role, text, CSS and finally similarity.
+ * Every fallback is recorded on the test so the reporter can list it. Heals never pass silently.
+ * @param page The page to search.
+ * @param t The element's primary locator and fingerprint.
+ * @param info The running test, used to attach the heal event.
+ * @returns A locator for the element.
+ * @throws If the test ID is gone and no fallback matches.
+ */
 export async function healLocator(page: Page, t: Target, info: TestInfo): Promise<Locator> {
   const primary = page.getByTestId(t.testId);
   if (await present(primary, PRIMARY_WAIT)) return primary;

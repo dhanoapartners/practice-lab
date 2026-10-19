@@ -1,8 +1,13 @@
+/**
+ * @file One place for every element the self-healing tests touch.
+ *
+ * The primary locator is the test ID; the other fields are the "fingerprint" the healer
+ * falls back on when a release changes the test ID. When healing-report.md suggests a new
+ * test ID, update it here.
+ */
 import type { Target } from './healer';
 
-// One place for every element the UI tests touch. The primary locator is the
-// test ID; the other fields are the "fingerprint" the healer falls back on
-// when a release changes the test ID.
+/** Healable targets, keyed by name. */
 export const L = {
   searchInput:  { key: 'searchInput',  testId: 'search-input',      role: 'searchbox', name: 'Search products' },
   suggestion:   { key: 'suggestion',   testId: 'search-suggestion', role: 'option' },

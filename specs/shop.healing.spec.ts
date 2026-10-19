@@ -1,10 +1,13 @@
+/**
+ * @file Self-healing version of the shop journey: every element goes through heal().
+ *
+ * Same steps as shop.plain.spec.ts. Run with `LAB_UI=v2` (`npm run demo:healed`): the test still
+ * passes and healing-report.md lists every locator that needs updating.
+ */
 import { test, expect } from '../support/healer';
 import { L } from '../support/locators';
 import { labUrl } from '../support/lab';
 
-// Same journey as shop.plain.spec.ts, but every element goes through heal().
-// Run with LAB_UI=v2: the test still passes and healing-report.md lists
-// every locator that needs updating.
 test('search, open a product and add it to the cart (self-healing)', async ({ page, heal }) => {
   await page.goto(labUrl('shop'));
 

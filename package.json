@@ -16,7 +16,10 @@
     "har:record": "cross-env UPDATE_HAR=1 playwright test specs/network.spec.ts -g HAR",
     "typecheck": "tsc -p .",
     "report": "playwright show-report",
-    "test:live": "playwright test --workers=2"
+    "test:live": "playwright test --workers=2",
+    "mock": "node support/mock-server.mjs",
+    "har:record:mock": "cross-env LAB_URL=http://localhost:8799 UPDATE_HAR=1 playwright test specs/network.spec.ts -g HAR",
+    "test:all": "cross-env LAB_URL=http://localhost:8799 LAB_LLM=1 VISUAL=1 playwright test --workers=2"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.1",

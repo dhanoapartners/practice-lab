@@ -3,3 +3,5 @@ test-results/
 playwright-report/
 healing-report.*
 .DS_Store
+# HAR fixtures are origin-specific; record locally with `npm run har:record`.
+fixtures/*.har

@@ -2,6 +2,24 @@
 
 [![Playwright](https://github.com/dhanoapartners/practice-lab/actions/workflows/playwright.yml/badge.svg)](https://github.com/dhanoapartners/practice-lab/actions/workflows/playwright.yml)
 
+## What this demonstrates
+
+*By Avneet Dhanoa (QualityFirstQA LLC). Part of a five-repo portfolio. The code here is training samples; production-grade versions (AI failure triage with device evidence, self-healing locators for web and mobile, plain English → tests gated on Android and iOS) are private and available for walkthrough in interviews.*
+
+- **Framework design at scale:** 255 Playwright + TypeScript tests across UI, API, accessibility, SVG charts and a banking app, with page objects, shared helpers and JSDoc throughout.
+- **Testing money and business rules:** balances, idempotent transfers, limits and a rate engine checked against independent calculations, catching four planted money bugs.
+- **Testing AI features:** self-healing locators, RAG answer checks, LLM-as-judge calibration and AI-agent tests that verify what the agent *did*, not what it said.
+- **Reporting people act on:** Allure reports (suites, timelines, history, categories) and a script that sorts each failure by likely cause.
+- **CI/CD:** GitHub Actions on every push and nightly.
+
+| Repo | Focus |
+|---|---|
+| **practice-lab** (this one) | Playwright web, API, accessibility, AI-feature testing |
+| [ai-agents-lab](https://github.com/dhanoapartners/ai-agents-lab) | MCP server for Claude, tested like an API; Claude skills for testers |
+| [k6-lab](https://github.com/dhanoapartners/k6-lab) | Performance: smoke, journey, load, stress, spike, chaos |
+| [selenium-migration-lab](https://github.com/dhanoapartners/selenium-migration-lab) | Selenium + Java → Playwright + TypeScript, side by side |
+| [mobile-lab](https://github.com/dhanoapartners/mobile-lab) | Appium native app on Android and iOS, device emulation, mobile locators |
+
 A Playwright + TypeScript suite for **[Practice Lab](https://www.dhanoapartners.com)**, a training site with a demo store, a UI playground, a REST API, SVG charts and a fictional bank. **255 tests** in 16 spec files: the site suite plus training samples for self-healing, RAG, LLM-as-judge, AI agents and failure triage, documented with JSDoc and run nightly in GitHub Actions.
 
 All test data is synthetic. The lab never uses real customer or personal data, and neither should your tests: generate or mock data instead.

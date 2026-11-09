@@ -7,3 +7,5 @@ fixtures/*.har
 reports/
 # Local secrets. Never commit.
 .env
+allure-results/
+allure-report/

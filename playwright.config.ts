@@ -33,6 +33,8 @@ export default defineConfig({
     ['list'],
     ['html', { open: 'never' }],
     ['json', { outputFile: 'reports/results.json' }],
+    // Allure: writes raw results to allure-results/; `npm run allure:generate` turns them into a report.
+    ['allure-playwright', { resultsDir: 'allure-results', detail: true, suiteTitle: true }],
   ],
   use: {
     baseURL: BASE_URL,

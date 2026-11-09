@@ -74,13 +74,21 @@ LAB_URL=http://localhost:8788 npm test
 | `VISUAL=1 npm test` | Adds the baseline screenshot test (`--update-snapshots` on the first run) |
 | `npm run demo:broken` / `demo:healed` | Fallback-locator demo on UI v2 |
 | `npm run demo:triage` | Release night + basic triage |
-| `npm run report` | Opens the HTML report |
+| `npm run report` | Opens the Playwright HTML report |
+| `npm run allure:generate` / `allure:open` | Builds / opens the Allure report from the last run (needs Java 11+) |
 
 UI v2 simulates a release: test IDs and button labels change (`add-to-cart` becomes `add-to-bag`, "Add to cart" becomes "Add to bag"). Switch it in the lab's header or with `?ui=v2`.
 
 ## Continuous integration
 
-`.github/workflows/playwright.yml` runs the typecheck, then the `@smoke` tests, then the rest, on every push, on pull requests and every night at 09:17 UTC. The HTML report is attached to each run for 14 days.
+`.github/workflows/playwright.yml` runs the typecheck, then the `@smoke` tests, then the rest, on every push, on pull requests and every night at 09:17 UTC. The Playwright HTML report and the Allure report are attached to each run for 14 days.
+
+## Reports
+
+Every run writes two reports:
+
+- **Playwright HTML report** (`npm run report`): the place to debug, with traces, screenshots and step-by-step actions.
+- **Allure report** (`npm run allure:generate`, then `npm run allure:open`): the place to share results, with suites, timelines, history and categories for people who don't read code.
 
 ## Training samples: AI-era testing
 

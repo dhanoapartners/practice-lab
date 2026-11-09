@@ -1,5 +1,5 @@
 # Runs the whole suite against the live Practice Lab every night and on every push.
-# The HTML report is saved as a build artifact for 14 days.
+# The Playwright HTML report and the Allure report are saved as build artifacts for 14 days.
 name: Playwright
 
 on:
@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - uses: actions/setup-java@v4 # the Allure CLI runs on Java
+        with:
+          distribution: temurin
+          java-version: 21
       - run: npm ci
       - run: npm run typecheck
       - run: npx playwright install --with-deps chromium
@@ -36,9 +40,14 @@ jobs:
         run: npm run test:regression
         env:
           CI: '1'
+      - name: Allure report
+        if: ${{ !cancelled() }}
+        run: npm run allure:generate
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: reports
+          path: |
+            playwright-report/
+            allure-report/
           retention-days: 14

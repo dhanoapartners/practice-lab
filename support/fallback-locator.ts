@@ -5,8 +5,7 @@
  * name, then to its exact visible text. Every fallback is logged and added to the test's annotations,
  * so a heal never passes silently.
  *
- * This is a teaching version. It shows the idea in ~40 lines; production healers add more fallback
- * strategies, confidence scoring, a heal report and a review workflow.
+ * It's deliberately small (about 40 lines) so you can read all of it in one sitting.
  *
  * @example
  * const addToCart = await findWithFallback(page, { testId: 'add-to-cart', role: 'button', name: 'Add to cart' });

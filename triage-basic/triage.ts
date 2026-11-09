@@ -12,10 +12,9 @@
  *   an assertion got a different value     → Product bug (check it)
  *   anything else                          → Needs a person
  *
- * This is a teaching version. Run it on release night (`npm run demo:triage`) and compare its answers with
- * the table in specs/triage/release-night.spec.ts: one failure lands in the wrong bucket, because error text
- * alone can't tell a missing element from a page whose backend is down. Fixing that needs more evidence
- * (what the page's API calls returned), which is where production triage tools start.
+ * Run it on release night (`npm run demo:triage`) and compare its answers with the table in
+ * specs/triage/release-night.spec.ts: one failure lands in the wrong bucket, because error text alone can't
+ * tell a missing element from a page whose backend is down. Working out how to fix that is the exercise.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 

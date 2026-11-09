@@ -92,7 +92,7 @@ Every run writes two reports:
 
 ## Training samples: AI-era testing
 
-Small, readable versions of the ideas taught in the Dhanoa Partners courses. They show the concept and run against the lab; production tools go much further.
+Small, readable examples of the ideas taught in the Dhanoa Partners courses. Each one runs against the lab and is meant to be read, run and extended.
 
 | Sample | Files | Run |
 |---|---|---|
@@ -110,7 +110,6 @@ The site's **[Triage Lab](https://www.dhanoapartners.com/#triage)** tells the st
 
 Compare the result with the table at the top of `specs/triage/release-night.spec.ts`. The basic rules get one failure wrong: the error text can't tell a missing element from a page whose backend is down. Working out why, and what extra evidence would fix it, is the exercise.
 
-The full AI failure triage agent (evidence capture, AI verdicts, confidence gating, Allure categories) and the production self-healing engine are part of **[QualityFirstQA](https://qualityfirstqa.com)**'s services. To see them on your own suite, [book a call](https://bookings.cloud.microsoft/book/QualityFirstQA@qualityfirstqa.com/).
 
 ## Test data
 

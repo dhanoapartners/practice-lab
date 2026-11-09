@@ -324,6 +324,8 @@ test.describe('Bank UI', () => {
 
   test('statement: rows are sorted by amount', async ({ page }) => {
     await page.getByTestId('bank-tab-statements').click();
+    // Let the first load finish before re-sorting: otherwise a slow first response can land after the sorted one.
+    await expect(page.getByTestId('stmt-row').first()).toBeVisible();
     await page.getByTestId('stmt-sort').selectOption('amount_desc');
     await expect(page.getByTestId('stmt-row').first()).toHaveAttribute('data-amount', '2350');
     const amounts = await page.getByTestId('stmt-row').evaluateAll((rows) => rows.map((r) => Number(r.getAttribute('data-amount'))));

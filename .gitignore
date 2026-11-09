@@ -1,0 +1,9 @@
+node_modules/
+test-results/
+playwright-report/
+.DS_Store
+# HAR fixtures are origin-specific; record locally with `npm run har:record`.
+fixtures/*.har
+reports/
+# Local secrets. Never commit.
+.env

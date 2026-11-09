@@ -1,0 +1,34 @@
+{
+  "name": "practice-lab-tests",
+  "private": true,
+  "description": "Playwright + TypeScript test suite for Practice Lab (dhanoapartners.com): UI, API, accessibility, SVG, banking, and training samples for self-healing, RAG, LLM-as-judge, AI agents and failure triage.",
+  "scripts": {
+    "test": "playwright test",
+    "test:local": "cross-env LAB_URL=http://localhost:8788 playwright test",
+    "test:v2": "cross-env LAB_UI=v2 playwright test",
+    "test:ui": "playwright test specs/shop.spec.ts specs/checkout.spec.ts specs/playground.spec.ts specs/hover.spec.ts specs/site.spec.ts",
+    "test:api": "playwright test specs/api.spec.ts specs/bank.spec.ts -g API",
+    "test:a11y": "playwright test specs/a11y.spec.ts",
+    "test:bank": "playwright test specs/bank.spec.ts",
+    "har:record": "cross-env UPDATE_HAR=1 playwright test specs/network.spec.ts -g HAR",
+    "typecheck": "tsc -p .",
+    "report": "playwright show-report",
+    "test:live": "playwright test --workers=2",
+    "test:all": "cross-env VISUAL=1 playwright test --workers=2",
+    "test:ai": "playwright test specs/rag.spec.ts specs/eval.spec.ts specs/agent.spec.ts",
+    "demo:broken": "cross-env LAB_UI=v2 playwright test specs/healing.spec.ts -g plain",
+    "demo:healed": "cross-env LAB_UI=v2 playwright test specs/healing.spec.ts -g fallback",
+    "demo:triage": "cross-env TRIAGE_DEMO=1 playwright test --retries=1 || tsx triage-basic/triage.ts",
+    "triage": "tsx triage-basic/triage.ts",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep-invert @smoke"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.1",
+    "@playwright/test": "1.48.2",
+    "@types/node": "20.16.11",
+    "cross-env": "7.0.3",
+    "typescript": "5.6.3",
+    "tsx": "4.19.2"
+  }
+}
